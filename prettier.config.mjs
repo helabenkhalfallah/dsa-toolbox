@@ -14,6 +14,7 @@ const config = {
     importOrder: ['^@ui/(.*)$', '^@server/(.*)$', '^[./]'],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true,
+    endOfLine: 'auto',
 };
 
 export default config;
