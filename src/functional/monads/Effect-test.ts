@@ -31,7 +31,7 @@ describe('Effect', () => {
             throw new Error('Failure');
         }).recover(() => 0);
 
-        expect(effect.run()).toStrictEqual(new Ok(0)); // ✅ Now TypeScript is happy!
+        expect(effect.run()).toStrictEqual(new Ok(0)); //  Now TypeScript is happy!
     });
 
     it('should not modify success values in recover', () => {

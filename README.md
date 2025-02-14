@@ -42,6 +42,10 @@ Whether you're building a lightweight application or handling large datasets, **
   - **Option<T>**: Safe handling of optional values (Some, None)
   - **Result<T, E>**: Error handling without exceptions (Ok, Err)
   - **Effect<T, E>**: Deferred computations with error safety
+- **Pattern Matching**: Expressive control flow using Match (matcher, case-of)
+- **Lenses & Optics**: Immutable state manipulation (Lens, Prism, Traversal)
+- **Trampoline**: Converts deep recursion into iteration to prevent stack overflows
+- **Transducers**: Composable data transformations with high performance (map, filter, reduce fused)
 
 ---
 
