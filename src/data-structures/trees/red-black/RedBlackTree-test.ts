@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { ComparableNode } from '../../../commons/ComparableNode.js';
-import { Color, RedBlackTree } from './RedBlackTree.js';
+import { ComparableNode } from '../../../commons/ComparableNode.ts';
+import { Color, RedBlackTree } from './RedBlackTree.ts';
 
 describe('RedBlackTree', () => {
     it('should create an empty Red-Black Tree', () => {
