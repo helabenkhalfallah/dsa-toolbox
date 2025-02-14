@@ -33,6 +33,16 @@ Whether you're building a lightweight application or handling large datasets, **
 - **Trees**: AVL Tree, Red-Black Tree, Binary Search Tree, B-Tree, Trie
 - **Probabilistic Structures**: Bloom Filter, HyperLogLog, CountMinSketch, SkipList, MinHash, SimHash, TDigest
 
+### 📊 Functional Programming (FP)
+
+- **Composition**: Function composition for declarative programming
+- **Currying**: Transforming functions into unary functions
+- **Functors**: CanApply for safe function application
+- **Monads**:
+  - **Option<T>**: Safe handling of optional values (Some, None)
+  - **Result<T, E>**: Error handling without exceptions (Ok, Err)
+  - **Effect<T, E>**: Deferred computations with error safety
+
 ---
 
 ## Benchmarks
@@ -183,6 +193,28 @@ Whether you're building a lightweight application or handling large datasets, **
 - Linear Search: Suited for small, unsorted datasets where search is infrequent.
 - Ternary Search: Good for distinct, ordered data ranges, often in optimization or game algorithms.
 
+## 🏎️ Functional Programming (FP) Benchmarks
+
+Functional programming utilities are designed for **safe, composable, and efficient** function transformations. 
+
+| **Function**      | **Operation**                   | **Time (ms)**        |
+|------------------|--------------------------------|----------------------|
+| `compose`       | Function composition           | 0.0565               |
+| `pipe`          | Function piping                | 0.0371               |
+| `curry`         | Currying                        | 0.0508               |
+| `partial`       | Partial Application            | 0.0302               |
+| `partialRight`  | Partial Right Application      | 0.0352               |
+| `uncurry`       | Uncurrying                     | 0.0591               |
+| `CanApply`      | Functor Mapping                | 0.0694               |
+| `Option`        | Option Mapping (Monad)         | 0.0767               |
+| `Result`        | Result Mapping (Monad)         | 0.0649               |
+| `Effect`        | Effect Execution (Monad)       | 0.0578               |
+
+- **Function composition (`compose`, `pipe`) is highly efficient**, enabling declarative and reusable transformations.
+- **Currying (`curry`, `uncurry`) and partial application (`partial`, `partialRight`) improve function modularity** while maintaining performance.
+- **Functors and Monads (`CanApply`, `Option`, `Result`, `Effect`) ensure safety and composability**, with reasonable execution times.
+- **Effect handling (`Effect`) provides error resilience**, making it ideal for managing side effects safely.
+
 ---
 
 ## 🛠️ Usage
@@ -225,6 +257,11 @@ import {
   BinarySearchTree,
   RedBlackTree,
   Trie,
+  Option,
+  Effect,
+  compose,
+  curry,
+  CanApply
 } from 'dsa-toolbox';
 
 binarySearch(sortedData, target, { compareFn: (a, b) => a - b, isSorted: true });
@@ -243,6 +280,19 @@ avlTree.insert(5);
 avlTree.insert(4);
 avlTree.insert(15);
 avlTree.search(10);
+
+
+const double = (x: number) => x * 2;
+const increment = (x: number) => x + 1;
+const doubleThenIncrement = compose(increment, double);
+console.log(doubleThenIncrement(3)); // 7
+
+const safeValue = CanApply(10)
+        .map((x) => x * 2)
+        .map((x) => `Result: ${x}`)
+        .getValue();
+
+console.log(safeValue); // "Result: 20"
 ```
 
 More usage examples can be found here:
@@ -268,59 +318,46 @@ For detailed explanations of each data structure and algorithm, please visit:
 
 ## Code coverage
 
-| File                                       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                          |
-|--------------------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------|
-| All files                                  | 90.84   | 90.44    | 96.34   | 90.84   |                                                                                            |
-| algorithms/search                          | 96.9    | 92.85    | 100     | 96.9    |                                                                                            |
-| BinarySearch.ts                            | 100     | 100      | 100     | 100     |                                                                                            |
-| ExponentialSearch.ts                       | 100     | 87.5     | 100     | 100     | 70                                                                                         |
-| HybridSearch.ts                            | 93.33   | 87.5     | 100     | 93.33   | 121-122                                                                                    |
-| LinearSearch.ts                            | 100     | 100      | 100     | 100     |                                                                                            |
-| TernarySearch.ts                           | 96      | 92.3     | 100     | 96      | 82                                                                                         |
-| algorithms/sort                            | 99.44   | 95.23    | 100     | 99.44   |                                                                                            |
-| HeapSort.ts                                | 100     | 100      | 100     | 100     |                                                                                            |
-| MergeSort.ts                               | 100     | 100      | 100     | 100     |                                                                                            |
-| TimSort.ts                                 | 99.24   | 93.47    | 100     | 99.24   | 128                                                                                        |
-| commons                                    | 85.71   | 100      | 75      | 85.71   |                                                                                            |
-| ComparableNode.ts                          | 85.71   | 100      | 75      | 85.71   | 50-51                                                                                      |
-| data-structures/cache                      | 100     | 94.59    | 100     | 100     |                                                                                            |
-| LFU.ts                                     | 100     | 90.9     | 100     | 100     | 75,148                                                                                     |
-| LRU.ts                                     | 100     | 100      | 100     | 100     |                                                                                            |
-| data-structures/heaps                      | 97.14   | 93.87    | 88.88   | 97.14   |                                                                                            |
-| MaxHeap.ts                                 | 97.14   | 96       | 88.88   | 97.14   | 138-139                                                                                    |
-| MinHeap.ts                                 | 97.14   | 91.66    | 88.88   | 97.14   | 139-140                                                                                    |
-| data-structures/linked-list                | 97.04   | 89.06    | 100     | 97.04   |                                                                                            |
-| DoublyLinkedList.ts                        | 95.65   | 88.57    | 100     | 95.65   | 87-89,91                                                                                   |
-| LinkedList.ts                              | 98.7    | 89.65    | 100     | 98.7    | 75                                                                                         |
-| data-structures/probabilistic/cardinality  | 84.61   | 87.5     | 87.5    | 84.61   |                                                                                            |
-| HyperLogLog.ts                             | 84.61   | 87.5     | 87.5    | 84.61   | 61-63,75-81                                                                                |
-| data-structures/probabilistic/frequency    | 100     | 100      | 100     | 100     |                                                                                            |
-| CountMinSketch.ts                          | 100     | 100      | 100     | 100     |                                                                                            |
-| data-structures/probabilistic/membership   | 100     | 100      | 100     | 100     |                                                                                            |
-| BloomFilter.ts                             | 100     | 100      | 100     | 100     |                                                                                            |
-| data-structures/probabilistic/ordered      | 97.87   | 97.22    | 100     | 97.87   |                                                                                            |
-| SkipList.ts                                | 97.87   | 97.22    | 100     | 97.87   | 102-103                                                                                    |
-| data-structures/probabilistic/quantile     | 97.97   | 91.42    | 100     | 97.97   |                                                                                            |
-| TDigest.ts                                 | 97.97   | 91.42    | 100     | 97.97   | 61,85                                                                                      |
-| data-structures/probabilistic/similarity   | 100     | 100      | 100     | 100     |                                                                                            |
-| MinHash.ts                                 | 100     | 100      | 100     | 100     |                                                                                            |
-| SimHash.ts                                 | 100     | 100      | 100     | 100     |                                                                                            |
-| data-structures/queue                      | 100     | 100      | 100     | 100     |                                                                                            |
-| Queue.ts                                   | 100     | 100      | 100     | 100     |                                                                                            |
-| data-structures/stack                      | 100     | 100      | 100     | 100     |                                                                                            |
-| Stack.ts                                   | 100     | 100      | 100     | 100     |                                                                                            |
-| data-structures/treaps                     | 82.41   | 88.88    | 92.85   | 82.41   |                                                                                            |
-| Treap.ts                                   | 82.41   | 88.88    | 92.85   | 82.41   | 84-85,111-115,163,168-176                                                                  |
-| data-structures/trees/avl                  | 90.62   | 84.31    | 100     | 90.62   |                                                                                            |
-| AVLTree.ts                                 | 90.62   | 84.31    | 100     | 90.62   | 118-119,169,196-198,201-203                                                                |
-| data-structures/trees/b-tree               | 68.71   | 75       | 76.47   | 68.71   |                                                                                            |
-| BTree.ts                                   | 68.71   | 75       | 76.47   | 68.71   | 67,114-115,119-120,146-147,169-171,182-192,203-208,220-221,232-243,252-261,270-279,294-295 |
-| data-structures/trees/bst                  | 93.4    | 93.61    | 100     | 93.4    |                                                                                            |
-| BinarySearchTree.ts                        | 93.4    | 93.61    | 100     | 93.4    | 132-134,137-139                                                                            |
-| data-structures/trees/red-black            | 76.07   | 81.81    | 100     | 76.07   |                                                                                            |
-| RedBlackTree.ts                            | 76.07   | 81.81    | 100     | 76.07   | 107-114,274,278-279,318-344,347-373,379,395-396,398-399,442-443                            |
-| data-structures/trees/trie                 | 100     | 96       | 100     | 100     |                                                                                            |
-| Trie.ts                                    | 100     | 96       | 100     | 100     | 89                                                                                         |
+| **Metric**  | **Coverage**  |
+|------------|-------------|
+| **Statements** | 91.38% |
+| **Branches**   | 91.11% |
+| **Functions**  | 96.03% |
+| **Lines**      | 91.38% |
+
+
+| **File/Module**                       | **% Stmts** | **% Branch** | **% Funcs** | **% Lines** | **Uncovered Line #s** |
+|--------------------------------------|------------|-------------|------------|------------|----------------------|
+| **All files**                         | 91.38      | 91.11       | 96.03      | 91.38      |                      |
+| **Algorithms / Search**               | 96.9       | 92.85       | 100        | 96.9       |                      |
+| `BinarySearch.ts`                     | 100        | 100         | 100        | 100        |                      |
+| `ExponentialSearch.ts`                 | 100        | 87.5        | 100        | 100        | 70                   |
+| `HybridSearch.ts`                      | 93.33      | 87.5        | 100        | 93.33      | 121-122              |
+| `LinearSearch.ts`                      | 100        | 100         | 100        | 100        |                      |
+| `TernarySearch.ts`                     | 96         | 92.3        | 100        | 96         | 82                   |
+| **Algorithms / Sort**                  | 99.44      | 95.23       | 100        | 99.44      |                      |
+| `HeapSort.ts`                           | 100        | 100         | 100        | 100        |                      |
+| `MergeSort.ts`                          | 100        | 100         | 100        | 100        |                      |
+| `TimSort.ts`                            | 99.24      | 93.47       | 100        | 99.24      | 128                  |
+| **Common Utilities**                    | 85.71      | 100         | 75         | 85.71      |                      |
+| `ComparableNode.ts`                     | 85.71      | 100         | 75         | 85.71      | 50-51                |
+| **Data Structures / Caching**           | 100        | 94.59       | 100        | 100        |                      |
+| `LFU.ts`                                | 100        | 90.9        | 100        | 100        | 75,148               |
+| `LRU.ts`                                | 100        | 100         | 100        | 100        |                      |
+| **Data Structures / Heaps**             | 97.14      | 93.87       | 88.88      | 97.14      |                      |
+| `MaxHeap.ts`                            | 97.14      | 96          | 88.88      | 97.14      | 138-139              |
+| `MinHeap.ts`                            | 97.14      | 91.66       | 88.88      | 97.14      | 139-140              |
+| **Data Structures / Linked Lists**      | 97.04      | 89.06       | 100        | 97.04      |                      |
+| `DoublyLinkedList.ts`                   | 95.65      | 88.57       | 100        | 95.65      | 87-89,91             |
+| `LinkedList.ts`                         | 98.7       | 89.65       | 100        | 98.7       | 75                   |
+| **Functional Programming (FP)**         | **96.38**  | **100**     | **93.61**  | **96.38**  |                      |
+| `Composition.ts`                        | 77.77      | 87.5        | 100        | 77.77      | 18-19                |
+| `Curry.ts`                              | 91.3       | 88.88       | 100        | 91.3       | 49-50                |
+| `CanApply.ts`                           | 100        | 85.71       | 100        | 100        | 29                   |
+| `Effect.ts`                             | 100        | 100         | 100        | 100        |                      |
+| `Option.ts`                             | 96.87      | 100         | 95         | 96.87      | 15-16                |
+| `Result.ts`                             | 94.44      | 100         | 90.9       | 94.44      | 16-17,26-27          |
+| `Partial.ts`                            | 100        | 100         | 100        | 100        |                      |
 
 ---
 

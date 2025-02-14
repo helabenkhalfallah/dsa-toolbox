@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Trie } from './Trie.js';
+import { Trie } from './Trie.ts';
 
 describe('Trie', () => {
     it('should insert and search for a word', () => {
