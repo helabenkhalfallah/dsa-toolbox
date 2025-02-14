@@ -129,9 +129,6 @@ Whether you're building a lightweight application or handling large datasets, **
 | 75      | B-Tree               | Insert            | 100000  | 50.4755            |
 | 76      | B-Tree               | Search            | 100000  | 0.0125             |
 | 77      | B-Tree               | Delete            | 100000  | 0.0196             |
-| 78      | Native Array         | Insert            | 1000000 | 2.0249             |
-| 79      | Native Array         | Search            | 1000000 | 0.1391             |
-| 80      | Native Array         | Delete            | 1000000 | 0.000              |
 
 **Suggested Applications:**
 - Small Data: For datasets around 1,000 elements, Native Arrays, Queues, and Stacks provide excellent performance.
@@ -193,7 +190,7 @@ Whether you're building a lightweight application or handling large datasets, **
 - Linear Search: Suited for small, unsorted datasets where search is infrequent.
 - Ternary Search: Good for distinct, ordered data ranges, often in optimization or game algorithms.
 
-## 🏎️ Functional Programming (FP) Benchmarks
+### Functional Programming (FP) Benchmarks
 
 Functional programming utilities are designed for **safe, composable, and efficient** function transformations. 
 
