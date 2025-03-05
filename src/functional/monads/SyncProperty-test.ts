@@ -1,14 +1,14 @@
 import * as fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
-import { Effect } from './Effect.ts';
 import { Err, Ok } from './Result.ts';
+import { SyncEffect } from './SyncEffect.ts';
 
-describe('Effect (Property-Based Tests)', () => {
+describe('SyncEffect (Property-Based Tests)', () => {
     it('should satisfy identity law: effect.map(x => x) === effect', () => {
         fc.assert(
             fc.property(fc.anything(), (x) => {
-                const effect = Effect(() => x);
+                const effect = SyncEffect(() => x);
                 expect(effect.map((v) => v).run()).toStrictEqual(effect.run());
             }),
         );
@@ -21,7 +21,7 @@ describe('Effect (Property-Based Tests)', () => {
                 fc.func(fc.anything()),
                 fc.func(fc.anything()),
                 (x, f, g) => {
-                    const effect = Effect(() => x);
+                    const effect = SyncEffect(() => x);
                     const composedEffect = effect.map(f).map(g);
                     const directEffect = effect.map((v) => g(f(v)));
 
@@ -37,18 +37,18 @@ describe('Effect (Property-Based Tests)', () => {
                 fc.anything(),
                 fc.func(
                     fc.constantFrom(
-                        Effect(() => 1),
-                        Effect(() => 2),
+                        SyncEffect(() => 1),
+                        SyncEffect(() => 2),
                     ),
                 ),
                 fc.func(
                     fc.constantFrom(
-                        Effect(() => 3),
-                        Effect(() => 4),
+                        SyncEffect(() => 3),
+                        SyncEffect(() => 4),
                     ),
                 ),
                 (x, f, g) => {
-                    const effect = Effect(() => x);
+                    const effect = SyncEffect(() => x);
                     const left = effect.flatMap(f).flatMap(g);
                     const right = effect.flatMap((v) => f(v).flatMap(g));
 
@@ -61,7 +61,7 @@ describe('Effect (Property-Based Tests)', () => {
     it('should always return Err if an effect throws', () => {
         fc.assert(
             fc.property(fc.string(), (errorMessage) => {
-                const effect = Effect(() => {
+                const effect = SyncEffect(() => {
                     throw new Error(errorMessage);
                 });
 
@@ -73,7 +73,7 @@ describe('Effect (Property-Based Tests)', () => {
     it('should recover from errors correctly', () => {
         fc.assert(
             fc.property(fc.string(), (errorMessage) => {
-                const effect = Effect(() => {
+                const effect = SyncEffect(() => {
                     throw new Error(errorMessage);
                 }).recover(() => 'Recovered');
 
@@ -85,7 +85,7 @@ describe('Effect (Property-Based Tests)', () => {
     it('should execute effects safely without throwing exceptions', () => {
         fc.assert(
             fc.property(fc.anything(), (x) => {
-                const effect = Effect(() => x);
+                const effect = SyncEffect(() => x);
                 expect(() => effect.run()).not.toThrow();
             }),
         );

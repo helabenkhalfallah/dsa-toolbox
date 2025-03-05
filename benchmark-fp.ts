@@ -2,9 +2,9 @@ import { performance } from 'perf_hooks';
 
 import {
     CanApply,
-    Effect,
     Ok,
     Option,
+    SyncEffect,
     compose,
     composeTransducers,
     curry,
@@ -183,7 +183,7 @@ benchmarks.push(
     ),
 );
 
-//  **Monads: Option, Result, and Effect**
+//  **Monads: Option, Result, and SyncEffect**
 benchmarks.push(
     benchmark(
         () => {
@@ -209,10 +209,10 @@ benchmarks.push(
 benchmarks.push(
     benchmark(
         () => {
-            Effect(() => 5 * 2).run();
+            SyncEffect(() => 5 * 2).run();
         },
-        'Effect',
-        'Effect Execution',
+        'SyncEffect',
+        'SyncEffect Execution',
     ),
 );
 
