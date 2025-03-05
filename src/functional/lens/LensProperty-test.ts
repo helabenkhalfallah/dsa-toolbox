@@ -1,7 +1,114 @@
 import * as fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
-import { isoLens, lens, optionalLens, traversalLens } from './Lens.ts';
+import { dynamicLens, isoLens, lens, optionalLens, traversalLens } from './Lens.ts';
+
+type AppState = {
+    user: {
+        profile: {
+            settings: {
+                theme: string;
+                notifications: boolean;
+            };
+        };
+    };
+};
+
+const themeLens = dynamicLens<AppState, ['user', 'profile', 'settings', 'theme']>([
+    'user',
+    'profile',
+    'settings',
+    'theme',
+]);
+
+const notificationsLens = dynamicLens<AppState, ['user', 'profile', 'settings', 'notifications']>([
+    'user',
+    'profile',
+    'settings',
+    'notifications',
+]);
+
+describe('dynamicLens', () => {
+    it('should correctly get the value at a deep path', () => {
+        fc.assert(
+            fc.property(fc.string(), (theme) => {
+                const state: AppState = {
+                    user: {
+                        profile: {
+                            settings: {
+                                theme,
+                                notifications: true,
+                            },
+                        },
+                    },
+                };
+                expect(themeLens.get(state)).toBe(theme);
+            }),
+        );
+    });
+
+    it('should correctly set the value at a deep path immutably', () => {
+        fc.assert(
+            fc.property(fc.boolean(), (notifications) => {
+                const state: AppState = {
+                    user: {
+                        profile: {
+                            settings: {
+                                theme: 'light',
+                                notifications: !notifications,
+                            },
+                        },
+                    },
+                };
+                const newState = notificationsLens.set(notifications, state);
+                expect(newState.user.profile.settings.notifications).toBe(notifications);
+                expect(state.user.profile.settings.notifications).not.toBe(notifications); // Ensure immutability
+            }),
+        );
+    });
+
+    it('should return undefined for missing paths', () => {
+        fc.assert(
+            fc.property(fc.object(), (randomObject) => {
+                const missingLens = dynamicLens<typeof randomObject, ['nonExistentKey']>([
+                    'nonExistentKey',
+                ]);
+                expect(missingLens.get(randomObject)).toBeUndefined();
+            }),
+        );
+    });
+
+    it('should correctly update nested values while keeping immutability', () => {
+        fc.assert(
+            fc.property(fc.string(), (newTheme) => {
+                const state: AppState = {
+                    user: {
+                        profile: {
+                            settings: {
+                                theme: 'light',
+                                notifications: true,
+                            },
+                        },
+                    },
+                };
+                const updatedState = themeLens.set(newTheme, state);
+                expect(updatedState.user.profile.settings.theme).toBe(newTheme);
+                expect(state.user.profile.settings.theme).toBe('light'); // Ensure immutability
+            }),
+        );
+    });
+
+    it('should correctly handle deeply nested objects', () => {
+        fc.assert(
+            fc.property(fc.dictionary(fc.string(), fc.anything()), (randomObj) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                const lens = dynamicLens<typeof randomObj, string[]>([]);
+                expect(lens.get(randomObj)).toEqual(randomObj);
+            }),
+        );
+    });
+});
 
 describe('Lens', () => {
     it('should get and set a property immutably', () => {

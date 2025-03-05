@@ -108,3 +108,92 @@ export const isoLens = <T, U>(
     get: getter,
     reverseGet: reverseGetter,
 });
+
+type MaxDepth = 10; // Prevent excessive recursion
+
+/**
+ * ** Type Helper:** Extracts the type at a given nested path.
+ *
+ * @template T - The root type.
+ * @template P - The path tuple (`["key1", "key2", ...]`).
+ */
+type DeepType<T, P extends PropertyPath<T>, D extends number[] = []> = D['length'] extends MaxDepth
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
+    : P extends [infer K, ...infer Rest]
+      ? K extends keyof T
+          ? Rest extends PropertyPath<T[K], [...D, 1]>
+              ? DeepType<T[K], Rest, [...D, 1]>
+              : T[K]
+          : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            any
+      : T;
+/**
+ * ** Type Helper:** Recursively constructs valid property paths.
+ *
+ * @template T - The root type.
+ */
+type PropertyPath<T, D extends number[] = []> = D['length'] extends MaxDepth
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
+    : T extends object
+      ? {
+            [K in keyof T]:
+                | [K]
+                | (T[K] extends object ? [K, ...PropertyPath<T[K], [...D, 1]>] : never);
+        }[keyof T]
+      : string[] | []; // Allow string array or empty array
+
+/**
+ * A dynamic lens for accessing and modifying deeply nested properties in an immutable way.
+ *
+ * @template T - The root object type.
+ * @template P - The property path type.
+ */
+export const dynamicLens = <T, P extends PropertyPath<T>>(path: P) => {
+    return {
+        get: (obj: T): DeepType<T, P> | undefined => {
+            let current: unknown = obj;
+            for (const key of path) {
+                if (current === null || current === undefined || typeof current !== 'object') {
+                    return undefined;
+                }
+                if (typeof key === 'string' && typeof current === 'object' && current !== null) {
+                    current = (current as Record<string, unknown>)[key];
+                } else {
+                    return undefined;
+                }
+            }
+            return current as DeepType<T, P> | undefined;
+        },
+
+        set: (value: DeepType<T, P>, obj: T): T => {
+            if (path.length === 0) return obj;
+
+            const pathArray = [...path];
+            const newObj: T = { ...obj };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let target: any = newObj;
+
+            for (let i = 0; i < pathArray.length; i++) {
+                const key = pathArray[i];
+                if (i === pathArray.length - 1) {
+                    target[key] = value;
+                } else {
+                    if (
+                        target[key] === undefined ||
+                        target[key] === null ||
+                        typeof target[key] !== 'object'
+                    ) {
+                        target[key] = {};
+                    }
+                    target[key] = { ...target[key] };
+                    target = target[key];
+                }
+            }
+            return newObj;
+        },
+
+        path,
+    };
+};

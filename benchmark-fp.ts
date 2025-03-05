@@ -8,12 +8,14 @@ import {
     compose,
     composeTransducers,
     curry,
+    debounce,
     filterTransducer,
     mapTransducer,
     partial,
     partialRight,
     pipe,
     takeTransducer,
+    throttle,
     uncurry,
 } from './src/index.ts';
 
@@ -213,6 +215,52 @@ benchmarks.push(
         },
         'SyncEffect',
         'SyncEffect Execution',
+    ),
+);
+
+// Simulated event triggering 1000 times in 1 second
+const eventCount = 1000;
+const durationMs = 1000;
+
+// ** Benchmark for Debounce **
+benchmarks.push(
+    benchmark(
+        () => {
+            let callCount = 0;
+            const debouncedFn = debounce(() => callCount++, 50);
+
+            for (let i = 0; i < eventCount; i++) {
+                debouncedFn();
+            }
+
+            // Simulate waiting for execution
+            const start = performance.now();
+            while (performance.now() - start < 60) {
+                // Do nothing
+            } // Wait a little over debounce delay
+
+            return callCount;
+        },
+        'debounce',
+        `Debouncing ${eventCount} calls over ${durationMs}ms`,
+    ),
+);
+
+// ** Benchmark for Throttle **
+benchmarks.push(
+    benchmark(
+        () => {
+            let callCount = 0;
+            const throttledFn = throttle(() => callCount++, 50);
+
+            for (let i = 0; i < eventCount; i++) {
+                throttledFn();
+            }
+
+            return callCount;
+        },
+        'throttle',
+        `Throttling ${eventCount} calls over ${durationMs}ms`,
     ),
 );
 

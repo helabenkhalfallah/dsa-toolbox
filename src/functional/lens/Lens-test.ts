@@ -1,6 +1,75 @@
 import { describe, expect, it } from 'vitest';
 
-import { isoLens, lens, optionalLens, traversalLens } from './Lens.ts';
+import { dynamicLens, isoLens, lens, optionalLens, traversalLens } from './Lens.ts';
+
+describe('dynamicLens', () => {
+    it('should get a value from a simple object', () => {
+        const obj = { name: 'Alice', age: 30 };
+        const nameLens = dynamicLens(['name']);
+        expect(nameLens.get(obj)).toBe('Alice');
+        const ageLens = dynamicLens(['age']);
+        expect(ageLens.get(obj)).toBe(30);
+    });
+
+    it('should get a value from a nested object', () => {
+        const obj = { address: { city: 'New York', zip: '10001' } };
+        const cityLens = dynamicLens(['address', 'city']);
+        expect(cityLens.get(obj)).toBe('New York');
+        const zipLens = dynamicLens(['address', 'zip']);
+        expect(zipLens.get(obj)).toBe('10001');
+    });
+
+    it('should return undefined for a non-existent path', () => {
+        const obj = { name: 'Bob' };
+        const ageLens = dynamicLens(['age']);
+        expect(ageLens.get(obj)).toBeUndefined();
+        const nestedLens = dynamicLens(['address', 'city']);
+        expect(nestedLens.get(obj)).toBeUndefined();
+    });
+
+    it('should set a value in a simple object', () => {
+        const obj = { name: 'Charlie', age: 25 };
+        const nameLens = dynamicLens(['name']);
+        const updatedObj = nameLens.set('David', obj);
+        expect(updatedObj).toEqual({ name: 'David', age: 25 });
+    });
+
+    it('should set a value in a nested object', () => {
+        const obj = { address: { city: 'London', zip: 'WC2N 5DU' } };
+        const cityLens = dynamicLens(['address', 'city']);
+        const updatedObj = cityLens.set('Paris', obj);
+        expect(updatedObj).toEqual({ address: { city: 'Paris', zip: 'WC2N 5DU' } });
+    });
+
+    it('should create nested objects when setting a value', () => {
+        const obj = {};
+        const lens = dynamicLens(['a', 'b', 'c']);
+        const updatedObj = lens.set(123, obj);
+        expect(updatedObj).toEqual({ a: { b: { c: 123 } } });
+    });
+
+    it('should set a value in a deeply nested object', () => {
+        const obj = { a: { b: { c: { d: { e: 1 } } } } };
+        const lens = dynamicLens(['a', 'b', 'c', 'd', 'e']);
+        const updatedObj = lens.set(2, obj);
+        expect(updatedObj).toEqual({ a: { b: { c: { d: { e: 2 } } } } });
+    });
+
+    it('should handle an empty path', () => {
+        const obj = { name: 'Eve' };
+        const lens = dynamicLens([]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(lens.set('test' as any, obj)).toEqual(obj); // test that the edge case is handled
+        expect(lens.get(obj)).toEqual(obj);
+    });
+
+    it('should handle undefined objects in get', () => {
+        const obj = undefined;
+        const lens = dynamicLens(['a', 'b']);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(lens.get(obj as any)).toEqual(undefined);
+    });
+});
 
 describe('Lens', () => {
     it('should get and set a property immutably', () => {
