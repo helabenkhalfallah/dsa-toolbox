@@ -2,8 +2,11 @@ import { performance } from 'perf_hooks';
 
 import {
     CanApply,
+    LazyCall,
+    LazyStream,
     Ok,
     Option,
+    PageLazyStream,
     SyncEffect,
     compose,
     composeTransducers,
@@ -266,3 +269,60 @@ benchmarks.push(
 
 //  **Display Benchmark Results**
 console.table(benchmarks);
+
+// ** Benchmark for Lazy Evaluation **
+async function runBenchmarks() {
+    const benchmarks: BenchmarkResult[] = [];
+
+    // ** Benchmark LazyCall **
+    const lazyComputation = new LazyCall(() => {
+        for (let i = 0; i < 1e7; i++) {
+            // Do nothing
+        } // Simulated heavy computation
+        return 42;
+    });
+
+    benchmarks.push(benchmark(() => lazyComputation.get(), 'LazyCall', 'First Evaluation'));
+
+    benchmarks.push(benchmark(() => lazyComputation.get(), 'LazyCall', 'Cached Evaluation'));
+
+    // ** Benchmark LazyStream **
+    async function* asyncNumbers(start = 1) {
+        let num = start;
+        while (num <= 10000) {
+            yield num++;
+        }
+    }
+
+    const stream = LazyStream.from(() => asyncNumbers())
+        .map((x) => x * 2)
+        .filter((x) => x % 3 === 0)
+        .take(1000);
+
+    benchmarks.push(
+        await benchmark(() => stream.toArray(), 'LazyStream', 'Lazy Mapping + Filtering + Taking'),
+    );
+
+    // ** Benchmark PageLazyStream (Paginated API simulation) **
+    async function* paginatedNumbers() {
+        for (let i = 1; i <= 100; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 10)); // Simulate API delay
+            yield Array.from({ length: 10 }, (_, j) => i * 10 + j);
+        }
+    }
+
+    const pageStream = PageLazyStream.from(() => paginatedNumbers())
+        .map((page) => page.map((x) => x * 2))
+        .filter((page) => page.some((x) => x % 5 === 0))
+        .take(5);
+
+    benchmarks.push(
+        await benchmark(() => pageStream.toArray(), 'PageLazyStream', 'Lazy Paginated Processing'),
+    );
+
+    // ** Display Benchmark Results **
+    console.table(benchmarks);
+}
+
+// Run benchmarks
+runBenchmarks();

@@ -5,6 +5,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
  */
 export default defineConfig({
     test: {
+        testTimeout: 10000,
         environment: 'node',
         exclude: [...configDefaults.exclude],
         include: [

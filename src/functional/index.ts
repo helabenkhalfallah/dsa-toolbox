@@ -12,3 +12,4 @@ export {
     takeTransducer,
 } from './transducers/Transducers.ts';
 export * from './monads/index.ts';
+export * from './lazy/index.ts';

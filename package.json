@@ -1,6 +1,6 @@
 {
   "name": "dsa-toolbox",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "description": "A powerful toolkit for data structures and algorithms in TypeScript, designed for optimal performance and versatility. The toolkit provides implementations of various data structures and algorithms, with a focus on search and sort operations, caching, and probabilistic data structures.",
   "type": "module",
   "main": "dist/index.js",
